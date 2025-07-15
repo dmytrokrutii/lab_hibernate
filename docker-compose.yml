@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:17.4
+    container_name: training-postgres-compose
+    environment:
+      POSTGRES_DB: training
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data-compose:/var/lib/postgresql/data
+    networks:
+      - training-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d training"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: training-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      postgres.database: training
+      postgres.host: postgres
+      postgres.port: 5432
+      postgres.username: admin
+      postgres.password: admin
+    volumes:
+      - ./logs:/app/logs
+    ports:
+      - "8080:8080"
+    networks:
+      - training-network
+
+networks:
+  training-network:
+    driver: bridge
+
+volumes:
+  postgres-data-compose:
