@@ -28,11 +28,6 @@ public class H2HibernateConfig extends HibernateConfig {
         super(env, databaseConfig);
     }
 
-    @Bean
-    @Primary
-    public DatabaseConfig databaseConfig() {
-        return new com.epam.learn.config.database.H2Config();
-    }
 
     /**
      * Creates and configures the EntityManagerFactory for H2 database.
@@ -81,10 +76,8 @@ public class H2HibernateConfig extends HibernateConfig {
         properties.put("hibernate.connection.pool_size", "10");
         properties.put("hibernate.connection.autocommit", "true");
 
-        // We don't need to import data from data.json file here
-        // as we're using StorageInitializer to load the data
-        // properties.put("hibernate.hbm2ddl.import_files", "data.json");
-        // properties.put("hibernate.hbm2ddl.import_files_sql_extractor", "org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor");
+        // Load initial data from data.sql
+        properties.put("hibernate.hbm2ddl.import_files", "data.sql");
 
         return properties;
     }

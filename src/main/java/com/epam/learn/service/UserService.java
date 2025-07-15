@@ -69,4 +69,12 @@ public interface UserService {
      * @return true if the password meets the strength requirements, false otherwise
      */
     boolean isPasswordStrong(String password);
+
+    /**
+     * Checks if the user's name has changed and updates the username if necessary.
+     *
+     * @param existingUser the existing user from the database
+     * @param updatedUser  the updated user with potentially new name
+     */
+    void handleNameChange(User existingUser, User updatedUser);
 }

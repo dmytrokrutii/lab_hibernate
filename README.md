@@ -41,6 +41,8 @@ Once the application is running with the H2 profile:
 
 3. You can now browse the database tables and execute SQL queries.
 
+Initial data for the H2 profile is loaded from `data.sql`. You can modify this file to customize the in-memory database content.
+
 ### H2 Database Configuration
 
 The H2 database is configured with the following settings:
