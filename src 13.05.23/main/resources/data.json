@@ -1,0 +1,104 @@
+{
+  "trainingTypes": [
+    {
+      "id": "f8c3de3d-1fea-4d7c-a8b0-29f63c4c3454",
+      "name": "Strength"
+    },
+    {
+      "id": "a9e2cfe5-9c9d-4a3b-86b1-0d1a894f9f8d",
+      "name": "Cardio"
+    },
+    {
+      "id": "b7d9c5a1-2e8f-4f1c-9d6b-8a3c7e5d2f1a",
+      "name": "Flexibility"
+    }
+  ],
+  "trainees": [
+    {
+      "id": "d5f6a7b8-c9d0-4e1f-a2b3-c4d5e6f7a8b9",
+      "firstName": "John",
+      "lastName": "Doe",
+      "username": "john.doe",
+      "password": "password123",
+      "active": true,
+      "dateOfBirth": "1990-01-15",
+      "address": "123 Main St"
+    },
+    {
+      "id": "e6f7a8b9-c0d1-4e2f-a3b4-c5d6e7f8a9b0",
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "username": "jane.smith",
+      "password": "password456",
+      "active": true,
+      "dateOfBirth": "1992-05-20",
+      "address": "456 Oak Ave"
+    }
+  ],
+  "trainers": [
+    {
+      "id": "f7a8b9c0-d1e2-4f3a-b4c5-d6e7f8a9b0c1",
+      "firstName": "Mike",
+      "lastName": "Johnson",
+      "username": "mike.johnson",
+      "password": "password789",
+      "active": true,
+      "specialization": {
+        "id": "f8c3de3d-1fea-4d7c-a8b0-29f63c4c3454"
+      }
+    },
+    {
+      "id": "a8b9c0d1-e2f3-4a4b-c5d6-e7f8a9b0c1d2",
+      "firstName": "Sarah",
+      "lastName": "Williams",
+      "username": "sarah.williams",
+      "password": "passwordabc",
+      "active": true,
+      "specialization": {
+        "id": "a9e2cfe5-9c9d-4a3b-86b1-0d1a894f9f8d"
+      }
+    }
+  ],
+  "trainings": [
+    {
+      "id": "b9c0d1e2-f3a4-4b5c-d6e7-f8a9b0c1d2e3",
+      "trainee": {
+        "id": "d5f6a7b8-c9d0-4e1f-a2b3-c4d5e6f7a8b9"
+      },
+      "trainer": {
+        "id": "f7a8b9c0-d1e2-4f3a-b4c5-d6e7f8a9b0c1"
+      },
+      "trainingName": "Basic Strength Training",
+      "trainingType": {
+        "id": "f8c3de3d-1fea-4d7c-a8b0-29f63c4c3454"
+      },
+      "trainingDate": "2025-07-15T10:00:00",
+      "trainingDuration": 60
+    },
+    {
+      "id": "c0d1e2f3-a4b5-4c6d-e7f8-a9b0c1d2e3f4",
+      "trainee": {
+        "id": "e6f7a8b9-c0d1-4e2f-a3b4-c5d6e7f8a9b0"
+      },
+      "trainer": {
+        "id": "a8b9c0d1-e2f3-4a4b-c5d6-e7f8a9b0c1d2"
+      },
+      "trainingName": "Cardio Workout",
+      "trainingType": {
+        "id": "a9e2cfe5-9c9d-4a3b-86b1-0d1a894f9f8d"
+      },
+      "trainingDate": "2025-07-16T14:00:00",
+      "trainingDuration": 45
+    }
+  ],
+  "traineeTrainerRelationships": [
+    {
+      "traineeId": "d5f6a7b8-c9d0-4e1f-a2b3-c4d5e6f7a8b9",
+      "trainerId": "f7a8b9c0-d1e2-4f3a-b4c5-d6e7f8a9b0c1"
+    },
+    {
+      "traineeId": "e6f7a8b9-c0d1-4e2f-a3b4-c5d6e7f8a9b0",
+      "trainerId": "a8b9c0d1-e2f3-4a4b-c5d6-e7f8a9b0c1d2"
+    }
+  ]
+}
