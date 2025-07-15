@@ -9,7 +9,7 @@ import com.epam.learn.service.TraineeService;
 import com.epam.learn.service.TrainerService;
 import com.epam.learn.service.TrainingService;
 import com.epam.learn.service.TrainingTypeService;
-import com.epam.learn.service.auth.AuthService;
+import com.epam.learn.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,7 +34,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ConsoleApplication implements CommandLineRunner {
 
-    private final AuthService authService;
+    private final UserService userService;
     private final TraineeService traineeService;
     private final TrainerService trainerService;
     private final TrainingService trainingService;
@@ -225,7 +225,7 @@ public class ConsoleApplication implements CommandLineRunner {
         String username = getStringInput("Enter username: ");
         String password = getStringInput("Enter password: ");
 
-        if (authService.authenticate(username, password)) {
+        if (userService.authenticate(username, password)) {
             isAuthenticated = true;
             currentUsername = username;
             System.out.println("Login successful!");
@@ -240,7 +240,7 @@ public class ConsoleApplication implements CommandLineRunner {
         String oldPassword = getStringInput("Enter current password: ");
         String newPassword = getStringInput("Enter new password: ");
 
-        if (!authService.isPasswordStrong(newPassword)) {
+        if (!userService.isPasswordStrong(newPassword)) {
             System.out.println("Password is not strong enough. It should have:");
             System.out.println("- At least 8 characters");
             System.out.println("- At least one uppercase letter");
@@ -250,7 +250,7 @@ public class ConsoleApplication implements CommandLineRunner {
             return;
         }
 
-        if (authService.changePassword(currentUsername, oldPassword, newPassword)) {
+        if (userService.changePassword(currentUsername, oldPassword, newPassword)) {
             System.out.println("Password changed successfully!");
         } else {
             System.out.println("Failed to change password. Please check your current password.");

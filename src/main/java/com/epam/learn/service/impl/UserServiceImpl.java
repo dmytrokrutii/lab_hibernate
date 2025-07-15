@@ -1,4 +1,4 @@
-package com.epam.learn.service.auth;
+package com.epam.learn.service.impl;
 
 import com.epam.learn.dao.TraineeDao;
 import com.epam.learn.dao.TrainerDao;
@@ -6,6 +6,7 @@ import com.epam.learn.exception.UserInitializationException;
 import com.epam.learn.model.user.Trainee;
 import com.epam.learn.model.user.Trainer;
 import com.epam.learn.model.user.User;
+import com.epam.learn.service.UserService;
 import com.epam.learn.util.validate.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,14 +16,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Implementation of the AuthService interface.
- * This service provides functionality for user authentication, password management,
- * and user initialization.
+ * Service implementation for user management and authentication operations.
+ * Provides functionality for user initialization, authentication and password handling.
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
+public class UserServiceImpl implements UserService {
 
     private final TraineeDao traineeDao;
     private final TrainerDao trainerDao;
@@ -84,17 +84,10 @@ public class AuthServiceImpl implements AuthService {
 
         LOGGER.debug("authenticate:: authenticating user with username: {}", username);
 
-        // Check trainee users with exact username
-        Optional<Trainee> trainee = traineeDao.findByUsername(username);
-        if (trainee.isPresent() && password.equals(trainee.get().getPassword())) {
-            LOGGER.debug("authenticate:: trainee authentication successful");
-            return true;
-        }
-
-        // Check trainer users with exact username
-        Optional<Trainer> trainer = trainerDao.findByUsername(username);
-        if (trainer.isPresent() && password.equals(trainer.get().getPassword())) {
-            LOGGER.debug("authenticate:: trainer authentication successful");
+        Optional<User> user = findUserByUsername(username);
+        if (user.isPresent() && password.equals(user.get().getPassword())) {
+            LOGGER.debug("authenticate:: {} authentication successful",
+                    user.get() instanceof Trainee ? "trainee" : "trainer");
             return true;
         }
 
@@ -110,8 +103,16 @@ public class AuthServiceImpl implements AuthService {
 
         LOGGER.debug("changePassword:: changing password for user with username: {}", username);
 
-        // Authenticate user first
-        if (!authenticate(username, oldPassword)) {
+        Optional<User> userOptional = findUserByUsername(username);
+        if (userOptional.isEmpty()) {
+            LOGGER.debug("changePassword:: user not found with username: {}", username);
+            return false;
+        }
+
+        User user = userOptional.get();
+
+        // Check old password
+        if (!user.getPassword().equals(oldPassword)) {
             LOGGER.debug("changePassword:: authentication failed for username: {}", username);
             return false;
         }
@@ -122,33 +123,32 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
 
-        // Update trainee password
-        Optional<Trainee> trainee = traineeDao.findByUsername(username);
-        if (trainee.isPresent()) {
-            Trainee traineeToUpdate = trainee.get();
-            traineeToUpdate.setPassword(newPassword);
-            traineeDao.update(traineeToUpdate.getId(), traineeToUpdate);
-            LOGGER.debug("changePassword:: trainee password updated successfully");
-            return true;
+        user.setPassword(newPassword);
+        if (user instanceof Trainee trainee) {
+            traineeDao.update(trainee.getId(), trainee);
+        } else if (user instanceof Trainer trainer) {
+            trainerDao.update(trainer.getId(), trainer);
         }
 
-        // Update trainer password
-        Optional<Trainer> trainer = trainerDao.findByUsername(username);
-        if (trainer.isPresent()) {
-            Trainer trainerToUpdate = trainer.get();
-            trainerToUpdate.setPassword(newPassword);
-            trainerDao.update(trainerToUpdate.getId(), trainerToUpdate);
-            LOGGER.debug("changePassword:: trainer password updated successfully");
-            return true;
-        }
-
-        LOGGER.debug("changePassword:: user not found with username: {}", username);
-        return false;
+        LOGGER.debug("changePassword:: password updated successfully");
+        return true;
     }
 
     @Override
     public boolean isPasswordStrong(String password) {
         return UserValidator.isPasswordStrong(password);
+    }
+
+    /**
+     * Retrieves a user by username across trainee and trainer repositories.
+     *
+     * @param username the username to search for
+     * @return an optional user if found
+     */
+    private Optional<User> findUserByUsername(String username) {
+        return traineeDao.findByUsername(username)
+                .<User>map(t -> t)
+                .or(() -> trainerDao.findByUsername(username).map(tr -> (User) tr));
     }
 
     /**

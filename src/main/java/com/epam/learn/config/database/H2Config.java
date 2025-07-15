@@ -34,8 +34,6 @@ public class H2Config implements DatabaseConfig {
      *
      * @return the configured data source
      */
-    @Bean(name = "dataSource")
-    @Primary
     @Override
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();

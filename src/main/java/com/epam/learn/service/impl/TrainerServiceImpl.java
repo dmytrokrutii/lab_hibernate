@@ -9,7 +9,7 @@ import com.epam.learn.model.user.Trainer;
 import com.epam.learn.service.TraineeService;
 import com.epam.learn.service.TrainerService;
 import com.epam.learn.service.TrainingTypeService;
-import com.epam.learn.service.auth.AuthService;
+import com.epam.learn.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -26,13 +26,13 @@ public class TrainerServiceImpl implements TrainerService {
 
     private final TrainerDao trainerDao;
     private TraineeService traineeService;
-    private final AuthService authService;
+    private final UserService userService;
     private final TrainingTypeService trainingTypeService;
 
     @Autowired
-    public TrainerServiceImpl(TrainerDao trainerDao, AuthService authService, TrainingTypeService trainingTypeService) {
+    public TrainerServiceImpl(TrainerDao trainerDao, UserService userService, TrainingTypeService trainingTypeService) {
         this.trainerDao = trainerDao;
-        this.authService = authService;
+        this.userService = userService;
         this.trainingTypeService = trainingTypeService;
     }
 
@@ -57,7 +57,7 @@ public class TrainerServiceImpl implements TrainerService {
         trainer.setSpecialization(trainingTypeService.findOrCreate(specializationName));
 
         // Initialize user and save
-        authService.initializeUser(trainer);
+        userService.initializeUser(trainer);
         trainerDao.save(trainer);
     }
 
@@ -86,7 +86,7 @@ public class TrainerServiceImpl implements TrainerService {
                 .orElseThrow(() -> new EntityNotFoundException(EntityType.TRAINER, id));
 
         // Handle name change and username regeneration
-        authService.handleNameChange(existingTrainer, updatedTrainer);
+        userService.handleNameChange(existingTrainer, updatedTrainer);
 
         updatedTrainer.setId(existingTrainer.getId());
         trainerDao.update(id, updatedTrainer);

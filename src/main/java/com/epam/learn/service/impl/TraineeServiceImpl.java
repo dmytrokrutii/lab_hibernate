@@ -8,16 +8,17 @@ import com.epam.learn.model.user.Trainee;
 import com.epam.learn.model.user.Trainer;
 import com.epam.learn.service.TraineeService;
 import com.epam.learn.service.TrainerService;
-import com.epam.learn.service.auth.AuthService;
+import com.epam.learn.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -26,13 +27,13 @@ public class TraineeServiceImpl implements TraineeService {
 
     private final TraineeDao traineeDao;
     private final @Lazy TrainerService trainerService;
-    private final AuthService authService;
+    private final UserService userService;
 
     @Override
     @org.springframework.transaction.annotation.Transactional
     public void create(Trainee trainee) {
         LOGGER.info("create:: creating trainee");
-        authService.initializeUser(trainee);
+        userService.initializeUser(trainee);
         traineeDao.save(trainee);
     }
 
@@ -61,7 +62,7 @@ public class TraineeServiceImpl implements TraineeService {
                 .orElseThrow(() -> new EntityNotFoundException(EntityType.TRAINEE, id));
 
         // Handle name change and username regeneration
-        authService.handleNameChange(existingTrainee, updatedTrainee);
+        userService.handleNameChange(existingTrainee, updatedTrainee);
 
         updatedTrainee.setId(existingTrainee.getId());
         traineeDao.update(id, updatedTrainee);
@@ -86,9 +87,7 @@ public class TraineeServiceImpl implements TraineeService {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username cannot be null or empty");
         }
-        if (trainerIds == null) {
-            throw new IllegalArgumentException("Trainer IDs list cannot be null");
-        }
+        Objects.requireNonNull(trainerIds, "Trainer IDs list cannot be null");
 
         // Get trainee by username
         Trainee trainee = getTraineeByUsername(username);
@@ -97,11 +96,9 @@ public class TraineeServiceImpl implements TraineeService {
         }
 
         // Get trainers by their IDs and create a set
-        Set<Trainer> trainers = new HashSet<>();
-        for (UUID trainerId : trainerIds) {
-            Trainer trainer = trainerService.getById(trainerId);
-            trainers.add(trainer);
-        }
+        Set<Trainer> trainers = trainerIds.stream()
+                .map(trainerService::getById)
+                .collect(Collectors.toSet());
 
         // Update trainee's trainers list
         traineeDao.updateTrainers(trainee.getId(), trainers);
